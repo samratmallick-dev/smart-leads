@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { leadsService } from '@/services/leadsService';
 import { extractErrorMessage } from '@/lib/errorUtils';
 import type { Lead, LeadFilters, PaginatedResponse } from '@/types';
@@ -18,10 +18,7 @@ export function useLeads(filters: LeadFilters) {
   const [state, setState] = useState<State>(initial);
   const [tick, setTick] = useState(0);
 
-  const stableFilters = useMemo(
-    () => filters,
-    [filters.status, filters.source, filters.search, filters.sort, filters.page]
-  );
+  const { status, source, search, sort, page } = filters;
 
   useEffect(() => {
     let cancelled = false;
@@ -29,7 +26,7 @@ export function useLeads(filters: LeadFilters) {
     const fetchLeads = async () => {
       setState((s) => ({ ...s, loading: true, error: null }));
       try {
-        const res: PaginatedResponse<Lead> = await leadsService.getLeads(stableFilters);
+        const res: PaginatedResponse<Lead> = await leadsService.getLeads(filters);
         if (!cancelled) setState({ data: res.data, total: res.total, page: res.page, totalPages: res.totalPages, loading: false, error: null });
       } catch (err: unknown) {
         if (!cancelled) setState((s) => ({ ...s, loading: false, error: extractErrorMessage(err, 'Failed to fetch leads') }));
@@ -38,7 +35,8 @@ export function useLeads(filters: LeadFilters) {
 
     fetchLeads();
     return () => { cancelled = true; };
-  }, [stableFilters, tick]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, source, search, sort, page, tick]);
 
   return { ...state, refetch: () => setTick((t) => t + 1) };
 }

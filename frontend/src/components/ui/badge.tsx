@@ -25,4 +25,3 @@ function Badge({
 }
 
 export { Badge }
-export { badgeVariants } from "./badge-variants"
