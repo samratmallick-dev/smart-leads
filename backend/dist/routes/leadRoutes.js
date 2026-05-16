@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const leadController_js_1 = require("../controllers/leadController.js");
+const auth_js_1 = require("../middleware/auth.js");
+const validate_js_1 = require("../middleware/validate.js");
+const index_js_1 = require("../validators/index.js");
+const router = (0, express_1.Router)();
+router.use(auth_js_1.authenticate);
+router.get('/export/csv', leadController_js_1.exportLeadsCSV);
+router.post('/', (0, validate_js_1.validate)(index_js_1.createLeadSchema), leadController_js_1.createLead);
+router.get('/', (0, validate_js_1.validate)(index_js_1.leadQuerySchema, 'query'), leadController_js_1.getLeads);
+router.get('/:id', leadController_js_1.getLeadById);
+router.put('/:id', (0, validate_js_1.validate)(index_js_1.updateLeadSchema), leadController_js_1.updateLead);
+router.delete('/:id', leadController_js_1.deleteLead);
+exports.default = router;
