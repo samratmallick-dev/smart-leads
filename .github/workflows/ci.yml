@@ -3,12 +3,46 @@ name: CI
 on:
   push:
     branches: [main, develop]
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - ".github/workflows/**"
   pull_request:
     branches: [main]
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+
 
 jobs:
+  detect-changes:
+    name: Detect Changed Services
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.changes.outputs.frontend }}
+      backend: ${{ steps.changes.outputs.backend }}
+      workflow: ${{ steps.changes.outputs.workflow }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+            workflow:
+              - '.github/workflows/**'
+
+  # ─── Backend ─────────────────────────────────────────────────────
   backend:
     name: Backend – build
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.workflow == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -17,14 +51,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
       - run: npm run build
 
+  # ─── Frontend ────────────────────────────────────────────────────
   frontend:
     name: Frontend – lint & build
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.workflow == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,7 +70,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
@@ -41,3 +78,45 @@ jobs:
       - run: npm run build
         env:
           VITE_API_URL: http://localhost:5000/api
+
+  # ─── Docker – Backend ────────────────────────────────────────────
+  docker-backend:
+    name: Build & Push — Backend
+    environment: production
+    needs: [detect-changes, backend]
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.workflow == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/smart-leads-backend:latest ./backend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/smart-leads-backend:latest
+
+  # ─── Docker – Frontend ───────────────────────────────────────────
+  docker-frontend:
+    name: Build & Push — Frontend
+    environment: production
+    needs: [detect-changes, frontend]
+    if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.workflow == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/smart-leads-frontend:latest ./frontend
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/smart-leads-frontend:latest

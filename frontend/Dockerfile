@@ -1,12 +1,20 @@
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
 
-COPY . .
+RUN npm install
+
+COPY tsconfig.json ./
+COPY vite.config.ts ./
+COPY index.html ./
+
+COPY src ./src
+COPY public ./public
+
 RUN npm run build
+
 
 FROM nginx:alpine
 
