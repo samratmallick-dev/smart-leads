@@ -68,7 +68,7 @@ docker compose up --build
 
 - Frontend → `http://localhost:5173`
 - Backend API → `http://localhost:5000`
-- MongoDB → `localhost:27017`
+- MongoDB → `mongodb+srv://<db_username>:<db_password>@<cluster_hostname>/`
 
 ---
 
