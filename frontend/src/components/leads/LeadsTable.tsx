@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import StatusBadge from './StatusBadge';
+import { useAuth } from '@/context/useAuth';
+import { UserRole } from '@/types';
 import type { Lead } from '@/types';
 
 interface Props {
@@ -15,6 +17,9 @@ interface Props {
 }
 
 export default function LeadsTable({ leads, loading, onView, onEdit, onDelete }: Props) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === UserRole.Admin;
+  const canModify = (lead: Lead) => isAdmin || lead.user?._id === user?.id;
   if (loading) {
     return (
       <div className="space-y-2">
@@ -66,13 +71,17 @@ export default function LeadsTable({ leads, loading, onView, onEdit, onDelete }:
                   <Button variant="ghost" size="icon-xs" onClick={() => onView(lead)} aria-label="View">
                     <Eye className="size-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon-xs" onClick={() => onEdit(lead)} aria-label="Edit">
-                    <Pencil className="size-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon-xs" onClick={() => onDelete(lead)} aria-label="Delete"
-                    className="text-destructive hover:text-destructive">
-                    <Trash2 className="size-3.5" />
-                  </Button>
+                  {canModify(lead) && (
+                    <Button variant="ghost" size="icon-xs" onClick={() => onEdit(lead)} aria-label="Edit">
+                      <Pencil className="size-3.5" />
+                    </Button>
+                  )}
+                  {canModify(lead) && (
+                    <Button variant="ghost" size="icon-xs" onClick={() => onDelete(lead)} aria-label="Delete"
+                      className="text-destructive hover:text-destructive">
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>

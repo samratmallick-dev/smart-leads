@@ -12,10 +12,14 @@ import { useLeads } from '@/hooks/useLeads';
 import { useDebounce } from '@/hooks/useDebounce';
 import { leadsService } from '@/services/leadsService';
 import { extractErrorMessage } from '@/lib/errorUtils';
+import { useAuth } from '@/context/useAuth';
+import { UserRole } from '@/types';
 import type { Lead, LeadFilters } from '@/types';
 import { toast } from 'sonner';
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === UserRole.Admin;
   const [filters, setFilters] = useState<LeadFilters>({ sort: 'desc', page: 1 });
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebounce(searchInput, 400);
@@ -55,7 +59,9 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold">Leads</h1>
-            <p className="text-sm text-muted-foreground">Manage and track your sales leads</p>
+            <p className="text-sm text-muted-foreground">
+              {isAdmin ? 'Managing all leads' : 'Managing your leads'}
+            </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleExport}>

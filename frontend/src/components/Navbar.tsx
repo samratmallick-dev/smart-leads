@@ -23,7 +23,14 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground hidden sm:block">
-            {user?.name} · <span className="capitalize">{user?.role}</span>
+            {user?.name}
+          </span>
+          <span className={`text-xs font-medium px-2 py-0.5 rounded-full hidden sm:block ${
+            user?.role === 'admin'
+              ? 'bg-primary/15 text-primary'
+              : 'bg-muted text-muted-foreground'
+          }`}>
+            {user?.role}
           </span>
           <Button variant="ghost" size="icon-sm" onClick={toggle} aria-label="Toggle theme">
             {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
