@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
+import { Input, PasswordInput } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/useAuth';
@@ -63,6 +63,7 @@ export default function LoginPage() {
               aria-invalid={!!errors.email}
               {...register('email')}
               placeholder="you@example.com"
+              className='px-2'
             />
             {errors.email && (
               <p role="alert" className="text-xs text-destructive">{errors.email.message}</p>
@@ -71,13 +72,13 @@ export default function LoginPage() {
 
           <div className="space-y-1">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="current-password"
               aria-invalid={!!errors.password}
               {...register('password')}
               placeholder="••••••"
+              className='px-2'
             />
             {errors.password && (
               <p role="alert" className="text-xs text-destructive">{errors.password.message}</p>
