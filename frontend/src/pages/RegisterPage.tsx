@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { authService } from '@/services/authService';
 import { extractErrorMessage } from '@/lib/errorUtils';
 import { UserRole } from '@/types';
@@ -26,7 +26,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState('');
 
-  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormValues>({
+  const { register, handleSubmit, setValue, control, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { role: UserRole.Sales },
   });
@@ -105,7 +105,7 @@ export default function RegisterPage() {
 
           <div className="space-y-1">
             <Label>Role</Label>
-            <Select value={watch('role')} onValueChange={(v) => setValue('role', v as FormValues['role'])}>
+            <Select value={useWatch({ control, name: 'role' })} onValueChange={(v) => setValue('role', v as FormValues['role'])}>
               <SelectTrigger className="w-full border border-input rounded px-3">
                 <SelectValue />
               </SelectTrigger>

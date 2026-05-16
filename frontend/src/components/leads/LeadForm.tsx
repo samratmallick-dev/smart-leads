@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { LeadSource, LeadStatus } from '@/types';
@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function LeadForm({ defaultValues, onSubmit, loading }: Props) {
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, setValue, control, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: defaultValues?.name ?? '',
@@ -51,7 +51,7 @@ export default function LeadForm({ defaultValues, onSubmit, loading }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
           <Label>Status</Label>
-          <Select value={watch('status')} onValueChange={(v) => setValue('status', v as FormValues['status'])}>
+          <Select value={useWatch({ control, name: 'status' })} onValueChange={(v) => setValue('status', v as FormValues['status'])}>
             <SelectTrigger className="w-full border border-input rounded px-3">
               <SelectValue />
             </SelectTrigger>
@@ -66,7 +66,7 @@ export default function LeadForm({ defaultValues, onSubmit, loading }: Props) {
 
         <div className="space-y-1">
           <Label>Source</Label>
-          <Select value={watch('source')} onValueChange={(v) => setValue('source', v as FormValues['source'])}>
+          <Select value={useWatch({ control, name: 'source' })} onValueChange={(v) => setValue('source', v as FormValues['source'])}>
             <SelectTrigger className="w-full border border-input rounded px-3">
               <SelectValue />
             </SelectTrigger>

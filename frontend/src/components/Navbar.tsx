@@ -1,7 +1,7 @@
 import { Moon, Sun, LogOut, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/useAuth';
+import { useTheme } from '@/context/useTheme';
 import { useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
