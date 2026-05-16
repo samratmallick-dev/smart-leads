@@ -25,14 +25,18 @@ export function useLeads(filters: LeadFilters) {
 
   useEffect(() => {
     let cancelled = false;
-    setState((s) => ({ ...s, loading: true, error: null }));
 
-    leadsService.getLeads(stableFilters).then((res: PaginatedResponse<Lead>) => {
-      if (!cancelled) setState({ data: res.data, total: res.total, page: res.page, totalPages: res.totalPages, loading: false, error: null });
-    }).catch((err: unknown) => {
-      if (!cancelled) setState((s) => ({ ...s, loading: false, error: extractErrorMessage(err, 'Failed to fetch leads') }));
-    });
+    const fetchLeads = async () => {
+      setState((s) => ({ ...s, loading: true, error: null }));
+      try {
+        const res: PaginatedResponse<Lead> = await leadsService.getLeads(stableFilters);
+        if (!cancelled) setState({ data: res.data, total: res.total, page: res.page, totalPages: res.totalPages, loading: false, error: null });
+      } catch (err: unknown) {
+        if (!cancelled) setState((s) => ({ ...s, loading: false, error: extractErrorMessage(err, 'Failed to fetch leads') }));
+      }
+    };
 
+    fetchLeads();
     return () => { cancelled = true; };
   }, [stableFilters, tick]);
 
