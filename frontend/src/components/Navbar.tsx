@@ -1,8 +1,8 @@
-import { Moon, Sun, LogOut, BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/useAuth';
-import { useTheme } from '@/context/useTheme';
-import { useNavigate } from 'react-router-dom';
+import { Moon, Sun, LogOut, BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/useAuth";
+import { useTheme } from "@/context/useTheme";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -11,7 +11,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -19,23 +19,35 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BarChart3 className="size-5 text-primary" />
-          <span className="font-semibold text-sm tracking-wide">Smart Leads</span>
+          <span className="font-semibold text-sm tracking-wide">GigFlow</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground hidden sm:block">
             {user?.name}
           </span>
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full hidden sm:block ${
-            user?.role === 'admin'
-              ? 'bg-primary/15 text-primary'
-              : 'bg-muted text-muted-foreground'
-          }`}>
+          <span
+            className={`text-xs font-medium px-2 py-0.5 rounded-full hidden sm:block ${
+              user?.role === "admin"
+                ? "bg-primary/15 text-primary"
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
             {user?.role}
           </span>
-          <Button variant="ghost" size="icon-sm" onClick={toggle} aria-label="Toggle theme">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={toggle}
+            aria-label="Toggle theme"
+          >
             {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={handleLogout} aria-label="Logout">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleLogout}
+            aria-label="Logout"
+          >
             <LogOut className="size-4" />
           </Button>
         </div>
